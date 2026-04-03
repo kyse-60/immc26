@@ -1,0 +1,162 @@
+code,scientific_name,common_name
+ABU,Abutilon spp.,Plant
+ACAFRU,Acalypha fruticosa,Plant
+ACAROB,Acacia robusta,Plant
+ACASEN,Acacia senegal,Plant
+ACASEY,Acacia seyal,Plant
+ACATOR,Acacia tortilis,Plant
+ACAXAN,Acacia xanthophloea,Plant
+ACHASP,Achyranthes aspera,Plant
+ACIJUB,Acinonyx jubatus,Cheetah
+AEPMEL,Aepyceros melampus,Impala
+ALBHAR,Albizia harveyi,Plant
+ALBU,Albuca spp.,Plant
+ALCBUS,Alcelaphus buselaphus,Hartebeest
+ALLRUB,Allophylus rubifolius,Plant
+ALOMAC,Aloe macrosiphon,Plant
+ALOSEC,Aloe secundiflora,Plant
+ANDGRE,Andropogon greenwayi,Plant
+ANDSCH,Andropogon schirensis,Plant
+ARI,Aristida spp.,Plant
+BALAEG,Balanites aegyptiaca,Plant
+BLEACA,Blepharis acanthodioides,Plant
+BOSAUG,Boscia augustifolia,Plant
+BOTINS,Bothriochloa insculpta,Plant
+BRASEM,Brachiaria semiundulata,Plant
+CANAUR,Canis aureus,Golden Jackal
+CANMES,Canis mesomelas,Black-backed Jackal
+CAPTOM,Capparis tomentosa,Plant
+CARCAR,Caracal caracal,Caracal
+CECCIL,Pennisetum ciliare,Plant
+CHLGAY,Chloris gayana,Plant
+CHLPYC,Chloris pycnothrix,Plant
+CHLROX,Chloris roxburghiana,Plant
+CISQUA,Cissus quadrangularis,Plant
+CISROT,Cissus rotundifolia,Plant
+COMMEAFR,Commelina africana,Plant
+COMMER,Commiphora merkeri,Plant
+COMMIAFR,Commiphora trothae,Plant
+COMMOL,Combretum molle,Plant
+COMSCH,Commiphora schimperi,Plant
+CONTAU,Connochaetes taurinus,Blue Wildebeest
+COROVA,Cordia ovalis,Plant
+CROCRO,Crocuta crocuta,Spotted Hyena
+CRODIK,Croton dichogamus,Plant
+CROMAC,Croton macrostachyus,Plant
+CROSPI,Crotalaria spinosa,Plant
+CYMEXC,Cymbopogon excavatus,Plant
+CYNDAC,Cynodon dactylon,Plant
+CYP,Cyperus spp.,Plant
+CYPH,Cyphostemma spp.,Plant
+DAMKOR,Damaliscus korrigum,Topi
+DIGDIA,Digitaria diagonalis,Plant
+DIGMAC,Digitaria macroblephara,Plant
+DIGMIL,Digitaria milanjiana,Plant
+DIGSCA,Digitaria scalarum,Plant
+DIGTER,Digitaria ternata,Plant
+DIGVEL,Digitaria velutina,Plant
+DIHAMP,Diheteropogon amplectens,Plant
+DINRET,Dinebra retroflexa,Plant
+DUOKIL,Duosperma kilimandscharica,Plant
+ECHHAP,Echinochloa haploclada,Plant
+EMICOC,Emilia coccinea,Plant
+EQUBUR,Equus quagga,Plains Zebra
+ERAASP,Eragrostis aspera,Plant
+ERACIL,Eragrostis cilianensis,Plant
+ERAEXA,Eragrostis exasperata,Plant
+ERATEN,Eragrostis tenuifolia,Plant
+ERINUB,Eriochloa nubica,Plant
+EUPCAN,Euphorbia candelabrum,Plant
+EUSPAS,Eustachys paspaloides,Plant
+FICGLU,Ficus glumosa,Plant
+FICING,Ficus ingens,Plant
+FICTHI,Ficus thonningii,Plant
+GAZGRA,Nanger granti,Grant's Gazelle
+GAZTHO,Eudorcas thomsonii,Thomson's Gazelle
+GIRCAM,Giraffa camelopardalis,Giraffe
+GRÉBIC,Grewia bicolor,Plant
+GREFALL,Grewia fallax,Plant
+GRETRI,Grewia trichocarpa,Plant
+HARSCH,Harpachne schimperi,Plant
+HELSTE,Heliotropium steudneri,Plant
+HETBRU,Heterohyrax brucei,Bush Hyrax
+HETCON,Heteropogon contortus,Plant
+HIB,Hibiscus spp.,Plant
+HIBLUN,Hibiscus lunariifolius,Plant
+HIPAMP,Hippopotamus amphibius,Hippopotamus
+HSOPP,Hoslundia opposita,Plant
+HYPDIS,Hyperthelia dissoluta,Plant
+HYPFIL,Hyparrhenia filipendula,Plant
+HYPFOR,Hypoestes forskaolii,Plant
+HYPRUF,Hyparrhenia rufa,Plant
+IBO,Iboza spp.,Plant
+INDBAS,Indigofera basiflora,Plant
+INDHOC,Indigofera hochstetteri,Plant
+IPOOBS,Ipomoea obscura,Plant
+JAS,Jasminum spp.,Plant
+KAL,Kalanchoe spp.,Plant
+KEDFOE,Kedrostis foetidissima,Plant
+KIGAFR,Kigelia africana,Plant
+KOBELL,Kobus ellipsiprymnus,Waterbuck
+KYLNER,Kyllinga nervosa,Plant
+LEPSER,Leptailurus serval,Serval
+LIPUKA,Lippia ukambensis,Plant
+LONERI,Lonchocarpus eriocalyx,Plant
+LOXAFR,Loxodonta africana,African Elephant
+LYCPIC,Lycaon pictus,African Wild Dog
+MADKIR,Madoqua kirkii,Kirk's Dik-dik
+MAETRI,Maerua cafra,Plant
+MICKUN,Microchloa kunthii,Plant
+OCI,Ocimum spp.,Plant
+OLE,Olea spp.,Plant
+UROÜR,Ourebia ourebi,Oribi
+PANCOL,Panicum coloratum,Plant
+PANDEU,Panicum deustum,Plant
+PANLEO,Panthera leo,Lion
+PANMAX,Panicum maximum,Plant
+PANPAR,Panthera pardus,Leopard
+PANREP,Panicum repens,Plant
+PAPANU,Papio anubis,Olive Baboon
+PAPCAP,Pappea capensis,Plant
+PAVASS,Pavetta assimilis,Plant
+PAVPAT,Pavonia patens,Plant
+PEDCAP,Pedetes capensis,Springhare
+PELCAL,Pellaea calomelanos,Plant
+PENMEZ,Pennisetum mezianum,Plant
+PENSTR,Pennisetum stramineum,Plant
+PHAACT,Phacochoerus africanus,Common Warthog
+PHRMAU,Phragmites mauritianus,Plant
+PHYSEP,Phyllanthus sepialis,Plant
+PROCAP,Procavia capensis,Rock Hyrax
+PSIJAE,Psilolemma jaegeri,Plant
+PUPLAP,Pupalia lappacea,Plant
+REDRED,Redunca redunca,Bohor Reedbuck
+RHAPUM,Rhabdomys pumilio,Four-striped Grass Mouse
+RHOREV,Rhoicissus revoilii,Plant
+SARVER,Sarga versicolor,Plant
+SCLBIR,Sclerocarya birrea,Plant
+SENDID,Senna didymobotrya,Plant
+SENEHR,Sansevieria ehrenbergii,Plant
+SENSUF,Sansevieria suffruticosa,Plant
+SETPAL,Setaria pallidefusca,Plant
+SETSPH,Setaria sphacelata,Plant
+SID,Sida spp.,Plant
+SOLDEN,Solanum dennekense,Plant
+SOLINC,Solanum incanum,Plant
+SOLNIG,Solanum nigrum,Plant
+SPOFES,Sporobolus festivus,Plant
+SPOFIM,Sporobolus fimbriatus,Plant
+SPOIOC,Sporobolus ioclados,Plant
+SPOPEL,Sporobolus pellucidus,Plant
+SPOPYR,Sporobolus pyramidalis,Plant
+SPOSPI,Sporobolus spicatus,Plant
+SPOSTA,Sporobolus stapfianus,Plant
+SYNCAF,Syncerus caffer,African Buffalo
+TAÜORY,Taurotragus oryx,Common Eland
+THETRI,Themeda triandra,Plant
+TRASCR,Tragelaphus scriptus,Bushbuck
+TRIEIC,Tricholaena teneriffae,Plant
+TURFIS,Turraea fischeri,Plant
+TYPCAP,Typha capensis,Plant
+XIMCAF,Ximenia caffra,Plant
+ZIZ,Ziziphus spp.,Plant
