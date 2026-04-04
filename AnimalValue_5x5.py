@@ -228,6 +228,57 @@ for i, name in enumerate(animal_names):
           f"(should = {pop:,})   total value: ${np.nansum(value_grid):,.0f}")
 
 
+# ================================================================
+# AGGREGATE 1 km → 5 km grid
+# ================================================================
+
+def aggregate_1km_to_5km(grid_1km, block=5):
+    rows, cols = grid_1km.shape
+    rows_trim = (rows // block) * block
+    cols_trim = (cols // block) * block
+    trimmed   = grid_1km[:rows_trim, :cols_trim]
+
+    reshaped  = trimmed.reshape(rows_trim // block, block,
+                                cols_trim // block, block)
+
+    all_nan   = np.all(np.isnan(reshaped), axis=(1, 3))
+
+    block_sum = np.nanmean(reshaped, axis=(1, 3)) * block * block
+    block_sum[all_nan] = np.nan
+
+    return block_sum
+
+total_value_5km = aggregate_1km_to_5km(total_value)
+
+# Cell centers = left edge + 2.5 km
+# Use centers for BOTH the containment check and the plot — no offset mismatch
+xi_5km_centers = xi[:total_value_5km.shape[1] * 5 : 5] + 2.5
+yi_5km_centers = yi[:total_value_5km.shape[0] * 5 : 5] + 2.5
+XI_5km, YI_5km = np.meshgrid(xi_5km_centers, yi_5km_centers)
+
+center_inside = shapely.contains_xy(
+    park_union,
+    (XI_5km * 1000).ravel(),
+    (YI_5km * 1000).ravel()
+).reshape(total_value_5km.shape)
+
+total_value_5km[~center_inside] = np.nan
+
+print(f"\n1 km grid : {total_value.shape}")
+print(f"5 km grid : {total_value_5km.shape}")
+print(f"Cells inside park (5km, centre-point rule): {center_inside.sum()}")
+
+# Save — index/columns are true cell centers in km
+df_5km = pd.DataFrame(
+    total_value_5km,
+    index=np.round(yi_5km_centers, 2),
+    columns=np.round(xi_5km_centers, 2)
+)
+df_5km.to_csv("animal_value_5km.csv")
+print("Saved → animal_value_5km.csv")
+
+
+
 # ── 7. Plot ───────────────────────────────────────────────────────────────────
 fig, ax = plt.subplots(figsize=(16, 9), facecolor="#0d1117")
 ax.set_facecolor("#0d1117")
@@ -372,4 +423,73 @@ plt.tight_layout()
 fig2.savefig("etosha_per_animal_maps.png", dpi=150,
              bbox_inches="tight", facecolor=fig2.get_facecolor())
 print("Saved → etosha_per_animal_maps.png")
+plt.show()
+
+# ================================================================
+# PLOT 5 km PIXELATED MAP
+# ================================================================
+fig, ax = plt.subplots(figsize=(16, 9), facecolor="#0d1117")
+ax.set_facecolor("#0d1117")
+
+cmap = plt.cm.YlOrRd
+vmin = np.nanpercentile(total_value_5km, 2)
+vmax = np.nanpercentile(total_value_5km, 98)
+norm = mcolors.Normalize(vmin=vmin, vmax=vmax)
+
+# pcolormesh with the 5km grid — each cell is a visible 5×5 km block
+ax.pcolormesh(XI_5km, YI_5km, total_value_5km,
+              cmap=cmap, norm=norm, shading="nearest", zorder=1)
+
+
+# Park boundary
+for geom in park_proj.geometry:
+    if geom.geom_type == "Polygon":
+        xs, ys = geom.exterior.xy
+        ax.plot([v / 1000 for v in xs], [v / 1000 for v in ys],
+                color="white", linewidth=1.8, zorder=4)
+    elif geom.geom_type == "MultiPolygon":
+        for part in geom.geoms:
+            xs, ys = part.exterior.xy
+            ax.plot([v / 1000 for v in xs], [v / 1000 for v in ys],
+                    color="white", linewidth=1.8, zorder=4)
+
+# Lodge markers
+ax.scatter(x_km, y_km, c="cyan", s=50, zorder=5,
+           edgecolors="black", linewidths=0.5, label="Lodges / camps")
+for j, loc in enumerate(location_cols):
+    ax.annotate(loc, (x_km[j], y_km[j]), fontsize=6.5,
+                color="white", xytext=(5, 4), textcoords="offset points", zorder=6)
+
+ax.plot(0, 0, "+", color="white", markersize=14,
+        markeredgewidth=2.5, zorder=6, label="Park centroid (0, 0)")
+
+# Grid lines at 5km intervals so you can see the discrete cells
+ax.grid(True, linestyle="--", alpha=0.15, color="white", zorder=0)
+
+ax.set_xlabel("Easting from centroid (km)",  fontsize=11, color="#cccccc")
+ax.set_ylabel("Northing from centroid (km)", fontsize=11, color="#cccccc")
+ax.tick_params(colors="#aaaaaa", labelsize=9)
+for spine in ax.spines.values():
+    spine.set_edgecolor("#444444")
+
+ax.set_title(
+    "Animal Sighting Value Density — Etosha National Park  [5 km × 5 km grid]\n"
+    "Σ  P(sighting) × Price × Population  |  summed from 1 km² kriging",
+    fontsize=13, fontweight="bold", color="white", pad=16,
+)
+
+sm   = plt.cm.ScalarMappable(norm=norm, cmap=cmap)
+cbar = fig.colorbar(sm, ax=ax, pad=0.02, fraction=0.025)
+cbar.set_label("Σ  P(sighting) × Price × Population",
+               fontsize=10, color="#cccccc")
+cbar.ax.yaxis.set_tick_params(color="#aaaaaa")
+plt.setp(cbar.ax.yaxis.get_ticklabels(), color="#aaaaaa")
+
+ax.legend(loc="upper right", fontsize=9,
+          facecolor="#1e2433", edgecolor="#555555", labelcolor="white")
+ax.set_aspect("equal")
+plt.tight_layout()
+plt.savefig("etosha_animal_value_5km.png", dpi=160,
+            bbox_inches="tight", facecolor=fig.get_facecolor())
+print("Saved → etosha_animal_value_5km.png")
 plt.show()
