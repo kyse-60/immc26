@@ -58,8 +58,12 @@ def build_danger(fire_csv, animal_csv):
     def norm(a):
         mn, mx = np.nanmin(a), np.nanmax(a)
         return (a - mn) / (mx - mn) if mx > mn else np.zeros_like(a)
-    danger  = norm(fire_arr) + norm(animal_arr)
     in_park = ~(np.isnan(fire_arr) | np.isnan(animal_arr))
+    fire_norm   = norm(fire_arr)
+    fire_norm   = 1.0 - fire_norm        # FIX: low NDVI → high fire risk
+    animal_norm = norm(animal_arr)
+    danger = fire_norm + animal_norm
+    danger[~in_park] = np.nan            # keep NaN outside park for display
     return danger, in_park, ref_index, ref_columns
 
 def str_to_path(s):
@@ -72,11 +76,11 @@ def main():
     parser = argparse.ArgumentParser()
     #parser.add_argument("--filtered", default="drone_paths_by_danger.csv")
     parser.add_argument("--filtered", default="human_paths_filtered.csv")
-    #parser.add_argument("--filtered", default="drone_paths_filtered.csv")
+    parser.add_argument("--filtered", default="drone_paths_filtered.csv")
     parser.add_argument("--fire",     default="fire_risk_5km.csv")
     parser.add_argument("--animal",   default="animal_value_5km.csv")
-    #parser.add_argument("--out",      default="drone_PATHS_plot.png")
-    parser.add_argument("--out",      default="human_PATHS_plot.png")
+    parser.add_argument("--out",      default="drone_PATHS_plot.png")
+    #parser.add_argument("--out",      default="human_PATHS_plot.png")
     args = parser.parse_args()
 
     # Load danger map

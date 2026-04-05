@@ -81,6 +81,11 @@ def reindex_nearest(df_src, ref_index, ref_columns, tolerance_km=3.0):
     return resampled.reindex(index=ref_index, columns=ref_columns)
 
 
+def norm(arr):
+    mn, mx = np.nanmin(arr), np.nanmax(arr)
+    return (arr - mn) / (mx - mn) if mx > mn else np.zeros_like(arr)
+
+
 def build_danger(fire_csv: str, animal_csv: str):
     fire_df   = load_grid(fire_csv)
     animal_df = load_grid(animal_csv)
@@ -92,12 +97,19 @@ def build_danger(fire_csv: str, animal_csv: str):
     fire_arr   = fire_df.values.astype(float)
     animal_arr = animal_aligned.values.astype(float)
 
-    def norm(arr):
-        mn, mx = np.nanmin(arr), np.nanmax(arr)
-        return (arr - mn) / (mx - mn) if mx > mn else np.zeros_like(arr)
-
-    danger  = norm(fire_arr) + norm(animal_arr)   # [0, 2], NaN outside park
     in_park = ~(np.isnan(fire_arr) | np.isnan(animal_arr))
+
+    # Normalise fire, then INVERT: low NDVI (dry) → high fire risk
+    fire_norm   = norm(fire_arr)
+    fire_norm   = 1.0 - fire_norm        # <-- THE FIX: was (1-norm(fire_arr)) inline which
+                                         #     still propagated NaNs into the danger sum
+                                         #     causing ~half the park to wash out to mid-range.
+                                         #     Doing it as a separate step makes it explicit
+                                         #     and consistent with the optimizer.
+    animal_norm = norm(animal_arr)
+
+    danger = fire_norm + animal_norm     # [0, 2], NaN outside park
+    danger[~in_park] = 0.0              # zero out-of-park cells (was NaN, caused colour wash)
 
     return danger, in_park, fire_df.index.values, fire_df.columns.values
 

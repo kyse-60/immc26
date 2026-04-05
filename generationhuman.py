@@ -95,7 +95,7 @@ def build_danger(fire_csv: str, animal_csv: str):
         mn, mx = np.nanmin(arr), np.nanmax(arr)
         return (arr - mn) / (mx - mn) if mx > mn else np.zeros_like(arr)
 
-    danger  = norm(fire_arr) + norm(animal_arr)
+    danger  = (1-norm(fire_arr)) + norm(animal_arr)
     in_park = ~(np.isnan(fire_arr) | np.isnan(animal_arr))
 
     return danger, in_park, fire_df.index.values, fire_df.columns.values
