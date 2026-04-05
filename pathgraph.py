@@ -124,7 +124,7 @@ def main():
 
     # ── Panel B: paths overlaid on danger ─────────────────────────────────────
     ax1 = axes[1]
-    style_ax(ax1, f"Top {n_paths} Patrol Loops")
+    style_ax(ax1, f"Top {n_paths} Human Patrol Loops")
     ax1.pcolormesh(XI, YI, display,
                    cmap="YlOrRd", norm=danger_norm,
                    shading="nearest", alpha=0.4, zorder=1)
@@ -151,7 +151,7 @@ def main():
                            norm=mcolors.Normalize(vmin=1, vmax=n_paths))
     sm.set_array([])
     cbar = fig.colorbar(sm, ax=ax1, fraction=0.03, pad=0.02)
-    cbar.set_label("danger ", color="black", fontsize=8)
+    cbar.set_label("Danger Removed Rank (1 is the best!)", color="black", fontsize=8)
     cbar.ax.yaxis.set_tick_params(color="black", labelsize=7)
     plt.setp(cbar.ax.yaxis.get_ticklabels(), color="black")
 
