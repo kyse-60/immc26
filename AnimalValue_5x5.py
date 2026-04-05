@@ -442,6 +442,29 @@ center_inside = shapely.contains_xy(
 
 total_value_5km[~center_inside] = np.nan
 
+# ================================================================
+# SAVE PER-ANIMAL 5km PROBABILITY MAPS TO CSV
+# ================================================================
+import os
+os.makedirs("animal_maps", exist_ok=True)
+
+for name, maps in animal_maps.items():
+    prob_grid_1km = maps["prob"]
+    prob_grid_5km = aggregate_1km_to_5km(prob_grid_1km) / 25  # mean probability
+    prob_grid_5km[~center_inside] = np.nan
+
+    safe_name = name.replace(" ", "_").replace("/", "-")
+    df_animal = pd.DataFrame(
+        prob_grid_5km,
+        index=np.round(yi_5km_centers, 2),
+        columns=np.round(xi_5km_centers, 2)
+    )
+    df_animal.to_csv(f"animal_maps/{safe_name}_5km.csv")
+
+print(f"Saved {len(animal_maps)} per-animal CSVs → animal_maps/")
+
+
+
 print(f"\n1 km grid : {total_value.shape}")
 print(f"5 km grid : {total_value_5km.shape}")
 print(f"Cells inside park (5km, centre-point rule): {center_inside.sum()}")

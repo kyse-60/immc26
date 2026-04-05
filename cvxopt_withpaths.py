@@ -58,34 +58,36 @@ COST_UNIT = 100.0   # normalise all costs to units of $100
  
 FIXED_ASSETS = {
     "stationary_person": {
-        "efficiency": 1,
-        "range_km":   0.5,
+        "efficiency": 0.64,
+        "range_km":   3.0,
         "cost_raw":   160,
-        "max_total":  100,
+        "cost":       160 / COST_UNIT,   # add this directly
+        "max_total":  123,
     },
     "camera": {
         "efficiency": 0.50,
-        "range_km":   3,
-        "cost_raw":   20,
-        "max_total":  100,
-    },
+        "range_km":   3.0,
+        "cost_raw":   100,
+        "cost":       100 / COST_UNIT,   # add this directly
+        "max_total":  123,
+    }
 }
-for p in FIXED_ASSETS.values():
-    p["cost"] = p["cost_raw"] / COST_UNIT
- 
-DRONE_PARAMS = {"efficiency": 0.35,  "eff_range_km": 4, "cost_raw": 325,  "cost": 325  / COST_UNIT}
-HUMAN_PARAMS = {"efficiency": 1, "eff_range_km": 0.5, "cost_raw": 400, "cost": 400 / COST_UNIT}
- 
-MAX_DRONE_PATHS  = 100
-MAX_HUMAN_PATHS  = 100
+
+
+DRONE_PARAMS  = {"efficiency": 0.35,  "eff_range_km": 4.0,  "cost_raw": 325,  "cost": 325/COST_UNIT}
+HUMAN_PARAMS  = {"efficiency": 1.0,   "eff_range_km": 3.0,  "cost_raw": 400,  "cost": 400/COST_UNIT}
+
+MAX_DRONE_PATHS = 123    # force at least some drones to be selected
+MAX_HUMAN_PATHS = 123
+
 MAX_INFLUENCE_KM = 55.0
  
 # ================================================================
 # 2.  PROBLEM SETTINGS
 # ================================================================
-BUDGET_RAW    = 10000          # $ per week
+BUDGET_RAW    = 65000          # $ per week
 BUDGET        = BUDGET_RAW / COST_UNIT   # in cost units
-TIME_LIMIT_MS = 2000_000
+TIME_LIMIT_MS = 500_000
 MIP_GAP       = 0.05             # slightly relaxed for faster solve
  
 # ================================================================
