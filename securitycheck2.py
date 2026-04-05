@@ -88,7 +88,7 @@ warnings.filterwarnings('ignore')
 # 1.  LOAD DATA
 # =============================================================================
  
-milp_df    = pd.read_csv('cvxopt_results/etosha_path_results_30k.csv')
+milp_df    = pd.read_csv('cvxopt_results_fr/etosha_path_results_70k.csv')
 species_df = pd.read_csv('immc - species_final (3).csv')
 foodweb_df = pd.read_csv('immc - foodweb_final (5).csv')
 maps_df    = pd.read_csv('immc - animal_maps (2).csv', index_col=0)
@@ -445,7 +445,7 @@ ax.legend(
 )
 ax.grid(True, alpha=0.3)
 ax.set_xlim(0, T_SIM)
-ax.set_ylim(0, K_arr[ib] * 1.1)
+ax.set_ylim(0, 1000)
 ax.set_xticks(range(0, T_SIM + 1, 5))
  
 fig.text(

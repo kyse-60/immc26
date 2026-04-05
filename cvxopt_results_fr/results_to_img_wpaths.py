@@ -16,7 +16,7 @@ import geopandas as gpd
 # ================================================================
 # CONFIG
 # ================================================================
-RESULTS_CSV      = "cvxopt_results_fr/etosha_path_results.csv"
+RESULTS_CSV      = "cvxopt_results_fr/etosha_path_results_30k.csv"
 DRONE_PATHS_CSV  = "selected_drone_paths.csv"
 HUMAN_PATHS_CSV  = "selected_human_paths.csv"
 SHP_PATH         = "WDPA_WDOECM_Apr2026_Public_884_shp-polygons.shp"
@@ -147,8 +147,8 @@ def draw_boundary(ax, lw=1.8, color="white"):
 def style_ax(ax):
     ax.set_facecolor("white")
     ax.grid(True, linestyle="--", alpha=0.2, color="#cccccc", zorder=0)
-    ax.set_xlabel("Easting from centroid (km)", fontsize=9, color="black")
-    ax.set_ylabel("Northing from centroid (km)", fontsize=9, color="black")
+    ax.set_xlabel("East from centroid (km)", fontsize=9, color="black")
+    ax.set_ylabel("North from centroid (km)", fontsize=9, color="black")
     ax.tick_params(colors="black", labelsize=8)
     for spine in ax.spines.values():
         spine.set_edgecolor("#aaaaaa")
@@ -199,7 +199,7 @@ ax = axes[0]
 style_ax(ax)
 ax.pcolormesh(XI, YI, danger_grid, cmap=cmap_d, norm=norm_d, shading="nearest", zorder=1)
 draw_boundary(ax, color="black")
-ax.set_title("Original danger map\n(fire + animal risk)", color="black",
+ax.set_title("Danger Map (No Security Measures)", color="black",
              fontsize=11, fontweight="bold")
 add_cbar(fig, ax, plt.cm.ScalarMappable(norm=norm_d, cmap=cmap_d), "Danger [0–2]")
  
