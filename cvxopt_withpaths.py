@@ -85,7 +85,7 @@ MAX_INFLUENCE_KM = 55.0
 # ================================================================
 # 2.  PROBLEM SETTINGS
 # ================================================================
-BUDGET_RAW    = 65000          # $ per week
+BUDGET_RAW    = 30000          # $ per week
 BUDGET        = BUDGET_RAW / COST_UNIT   # in cost units
 TIME_LIMIT_MS = 500_000
 MIP_GAP       = 0.05             # slightly relaxed for faster solve
@@ -154,6 +154,7 @@ def norm(arr):
  
  
 fire_norm_2d   = norm(fire_arr)
+fire_norm_2d = 1- fire_norm_2d
 animal_norm_2d = norm(animal_arr)
  
 danger = fire_norm_2d + animal_norm_2d   # [0, 2], NaN outside park
