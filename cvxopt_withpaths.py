@@ -85,7 +85,7 @@ MAX_INFLUENCE_KM = 55.0
 # ================================================================
 # 2.  PROBLEM SETTINGS
 # ================================================================
-BUDGET_RAW    = 30000          # $ per week
+BUDGET_RAW    = 10000          # $ per week
 BUDGET        = BUDGET_RAW / COST_UNIT   # in cost units
 TIME_LIMIT_MS = 500_000
 MIP_GAP       = 0.05             # slightly relaxed for faster solve
@@ -475,7 +475,7 @@ for i, (r, c) in enumerate(valid_cells):
         "covered_by_drone": int(any(drone_removal[p, i] > 1e-6 for p in sel_drone)),
         "covered_by_human": int(any(human_removal[p, i] > 1e-6 for p in sel_human)),
     })
-pd.DataFrame(rows_out).to_csv("etosha_path_results.csv", index=False)
+pd.DataFrame(rows_out).to_csv("cvxopt_results_fr/etosha_path_results.csv", index=False)
 print("Cell-level results   -> etosha_path_results.csv")
  
 drone_out = [
