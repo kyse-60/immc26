@@ -23,7 +23,7 @@ from pyproj import Transformer
 # ================================================================
 # CONFIG
 # ================================================================
-RESULTS_CSV = "etosha_results.csv"
+RESULTS_CSV = "etosha_path_results.csv"
 SHP_PATH    = "WDPA_WDOECM_Apr2026_Public_884_shp-polygons.shp"
 CELL_SIZE   = 5.0   # km
  

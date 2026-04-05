@@ -177,6 +177,184 @@ def interpolate_idw(x_km, y_km, z, XI, YI, power=2):
     z_flat = (weights @ z).reshape(XI.shape)
     return np.clip(z_flat, 0.0, 1.0)
 
+# ── 5b. Variogram diagnostic plot ────────────────────────────────────────────
+
+def plot_variogram_diagnostic(x_km, y_km, z, animal_name="[first animal]"):
+    """
+    Fits (or uses fixed params for) an OrdinaryKriging object on z,
+    then extracts the experimental variogram cloud + lags and overlays
+    the fitted/fixed model curve.
+    """
+    from pykrige.ok import OrdinaryKriging
+    from pykrige.variogram_models import (
+        spherical_variogram_model,
+        gaussian_variogram_model,
+        exponential_variogram_model,
+        linear_variogram_model,
+        power_variogram_model,
+    )
+
+    VARIOGRAM_FUNCS = {
+        "spherical":   spherical_variogram_model,
+        "gaussian":    gaussian_variogram_model,
+        "exponential": exponential_variogram_model,
+        "linear":      linear_variogram_model,
+        "power":       power_variogram_model,
+    }
+
+    # Build the same OK object used in interpolation
+    if FIT_VARIOGRAM:
+        ok = OrdinaryKriging(
+            x_km, y_km, z,
+            variogram_model=VARIOGRAM_MODEL,
+            nlags=4, weight=True,
+            verbose=False, enable_plotting=False,
+        )
+    else:
+        data_sill = float(np.var(z))
+        ok = OrdinaryKriging(
+            x_km, y_km, z,
+            variogram_model=VARIOGRAM_MODEL,
+            variogram_parameters={
+                "sill":   data_sill,
+                "range":  VARIOGRAM_RANGE_KM,
+                "nugget": 0.0,
+            },
+            verbose=False, enable_plotting=False,
+        )
+
+    # ── Experimental variogram points ────────────────────────────────────────
+    # pykrige stores these after fitting:
+    #   ok.lags         → lag bin centres (km)
+    #   ok.semivariance → experimental semivariance per bin
+    #   ok.variogram_model_parameters → [sill, range, nugget] (spherical/gaussian/exp)
+    lags_exp  = ok.lags          # shape (nlags,)
+    gamma_exp = ok.semivariance  # shape (nlags,)
+
+    # ── Fitted / fixed model curve ────────────────────────────────────────────
+    h_fine = np.linspace(0, lags_exp.max() * 1.1, 300)
+    params = ok.variogram_model_parameters   # list: [psill, range, nugget]
+    vfunc  = VARIOGRAM_FUNCS[VARIOGRAM_MODEL]
+    gamma_model = vfunc(params, h_fine)
+
+    # ── Raw variogram cloud (all point-pairs) ─────────────────────────────────
+    pts  = np.column_stack([x_km, y_km])
+    n    = len(pts)
+    cloud_h, cloud_g = [], []
+    for a in range(n):
+        for b in range(a + 1, n):
+            dist = np.linalg.norm(pts[a] - pts[b])
+            sv   = 0.5 * (z[a] - z[b]) ** 2
+            cloud_h.append(dist)
+            cloud_g.append(sv)
+    cloud_h = np.array(cloud_h)
+    cloud_g = np.array(cloud_g)
+
+    # ── Plot ──────────────────────────────────────────────────────────────────
+    fig, ax = plt.subplots(figsize=(9, 5), facecolor="#ffffff")
+    ax.set_facecolor("#ffffff")
+
+    # Raw cloud
+    ax.scatter(cloud_h, cloud_g, s=18, alpha=0.45, color="#4fc3f7",
+               zorder=2, label="Variogram cloud\n(all point-pairs)")
+
+    # Binned experimental variogram
+    ax.scatter(lags_exp, gamma_exp, s=80, color="#ffd54f", zorder=4,
+               edgecolors="white", linewidths=0.8,
+               label=f"Experimental variogram\n({len(lags_exp)} lag bins)")
+
+    # Fitted model curve
+    fit_label = (
+        f"{VARIOGRAM_MODEL.capitalize()} model\n"
+        f"sill={params[0]:.4f}  range={params[1]:.1f} km  nugget={params[2]:.4f}"
+    )
+    ax.plot(h_fine, gamma_model, color="#ef5350", linewidth=2.2,
+            zorder=5, label=fit_label)
+
+    # Sill & nugget reference lines
+    total_sill = params[0] + params[2]   # psill + nugget
+    ax.axhline(total_sill, color="#ef5350", linewidth=0.8,
+               linestyle="--", alpha=0.5, zorder=1)
+    ax.axhline(params[2],  color="#aaaaaa", linewidth=0.8,
+               linestyle=":",  alpha=0.5, zorder=1)
+    ax.axvline(params[1],  color="#ef5350", linewidth=0.8,
+               linestyle="--", alpha=0.4, zorder=1,
+               label=f"Range = {params[1]:.1f} km")
+
+    ax.set_xlabel("Lag distance  (km)",    fontsize=11, color="#cccccc")
+    ax.set_ylabel("Semivariance  γ(h)",    fontsize=11, color="#cccccc")
+    ax.tick_params(colors="#aaaaaa", labelsize=9)
+    for spine in ax.spines.values():
+        spine.set_edgecolor("#444444")
+
+    fit_mode = "fitted from data" if FIT_VARIOGRAM else "fixed (domain knowledge)"
+    ax.set_title(
+        f"Variogram Diagnostic  —  '{animal_name}'  probabilities\n"
+        f"Model: {VARIOGRAM_MODEL}  |  Parameters: {fit_mode}",
+        fontsize=12, fontweight="bold", color="white", pad=12,
+    )
+
+    ax.legend(fontsize=8.5, facecolor="#1e2433",
+              edgecolor="#555555", labelcolor="white",
+              loc="upper left")
+    ax.set_xlim(left=0)
+    ax.set_ylim(bottom=0)
+
+    plt.tight_layout()
+    plt.savefig("etosha_variogram_diagnostic.png", dpi=150,
+                bbox_inches="tight", facecolor=fig.get_facecolor())
+    print("Saved → etosha_variogram_diagnostic.png")
+    plt.show()
+
+
+# Call once using the first animal's data as representative
+if INTERP_METHOD == "kriging":
+    from pykrige.variogram_models import spherical_variogram_model
+
+    targets = ["Spotted Hyena", "Cheetah", "Leopard"]
+    fig, axes = plt.subplots(1, 3, figsize=(18, 5), facecolor="white")
+
+    for ax, name in zip(axes, targets):
+        ax.set_facecolor("white")
+        i = animal_names.index(name)
+        z = prob_matrix[i]
+
+        ok = OrdinaryKriging(x_km, y_km, z, variogram_model="spherical",
+                             variogram_parameters={"sill": float(np.var(z)),
+                                                   "range": VARIOGRAM_RANGE_KM,
+                                                   "nugget": 0.0},
+                             verbose=False, enable_plotting=False)
+
+        pts     = np.column_stack([x_km, y_km])
+        cloud_h = [np.linalg.norm(pts[a] - pts[b])
+                   for a in range(len(pts)) for b in range(a+1, len(pts))]
+        cloud_g = [0.5*(z[a]-z[b])**2
+                   for a in range(len(z))  for b in range(a+1, len(z))]
+
+        h_fine      = np.linspace(0, max(cloud_h) * 1.1, 300)
+        gamma_model = spherical_variogram_model(ok.variogram_model_parameters, h_fine)
+
+        sc1 = ax.scatter(cloud_h, cloud_g, s=12, alpha=0.4, color="steelblue", zorder=2)
+        sc2 = ax.scatter(ok.lags, ok.semivariance, s=60, color="gold",
+                         edgecolors="black", linewidths=0.6, zorder=4)
+        ln, = ax.plot(h_fine, gamma_model, color="red", linewidth=2, zorder=5)
+
+        ax.set_title(name, fontsize=11, fontweight="bold", color="black")
+        ax.set_xlabel("Lag (km)", fontsize=9, color="black")
+        ax.set_ylabel("γ(h)",     fontsize=9, color="black")
+        ax.tick_params(colors="black", labelsize=8)
+        ax.spines[:].set_edgecolor("black")
+        ax.set_xlim(left=0)
+        ax.set_ylim(bottom=0)
+
+        ax.legend([sc1, sc2, ln],
+          ["Variogram cloud", "Binned experimental", "Spherical model"],
+          fontsize=8, framealpha=1, edgecolor="black", loc="upper right")
+
+    plt.tight_layout()
+    plt.savefig("etosha_variogram_selected.png", dpi=150,
+                bbox_inches="tight", facecolor="white")
+    plt.show()
 
 # ── 6. Per-animal interpolation → value density → accumulate ─────────────────
 total_value = np.full(grid_shape, np.nan)
@@ -280,11 +458,11 @@ print("Saved → animal_value_5km.csv")
 
 
 # ── 7. Plot ───────────────────────────────────────────────────────────────────
-fig, ax = plt.subplots(figsize=(16, 9), facecolor="#0d1117")
-ax.set_facecolor("#0d1117")
+fig, ax = plt.subplots(figsize=(16, 9), facecolor="white")
+ax.set_facecolor("white")
 
 cmap = plt.cm.YlOrRd
-vmin = np.nanpercentile(total_value, 2)    # avoid outlier stretching
+vmin = np.nanpercentile(total_value, 2)
 vmax = np.nanpercentile(total_value, 98)
 norm = mcolors.Normalize(vmin=vmin, vmax=vmax)
 
@@ -296,46 +474,46 @@ for geom in park_proj.geometry:
     if geom.geom_type == "Polygon":
         xs, ys = geom.exterior.xy
         ax.plot([v / 1000 for v in xs], [v / 1000 for v in ys],
-                color="white", linewidth=1.8, zorder=4)
+                color="black", linewidth=1.8, zorder=4)
     elif geom.geom_type == "MultiPolygon":
         for part in geom.geoms:
             xs, ys = part.exterior.xy
             ax.plot([v / 1000 for v in xs], [v / 1000 for v in ys],
-                    color="white", linewidth=1.8, zorder=4)
+                    color="black", linewidth=1.8, zorder=4)
 
 # Lodge markers & labels
-ax.scatter(x_km, y_km, c="cyan", s=50, zorder=5,
+ax.scatter(x_km, y_km, c="steelblue", s=50, zorder=5,
            edgecolors="black", linewidths=0.5, label="Lodges / camps")
 for j, loc in enumerate(location_cols):
     ax.annotate(loc, (x_km[j], y_km[j]), fontsize=6.5,
-                color="white", xytext=(5, 4), textcoords="offset points",
+                color="black", xytext=(5, 4), textcoords="offset points",
                 zorder=6)
 
 # Centroid crosshair
-ax.plot(0, 0, "+", color="white", markersize=14,
+ax.plot(0, 0, "+", color="black", markersize=14,
         markeredgewidth=2.5, zorder=6, label="Park centroid (0, 0)")
 
 # Formatting
-ax.grid(True, linestyle="--", alpha=0.15, color="white", zorder=0)
-ax.set_xlabel("Easting from centroid (km)",  fontsize=11, color="#cccccc")
-ax.set_ylabel("Northing from centroid (km)", fontsize=11, color="#cccccc")
-ax.tick_params(colors="#aaaaaa", labelsize=9)
+ax.grid(True, linestyle="--", alpha=0.15, color="black", zorder=0)
+ax.set_xlabel("East from centroid (km)",  fontsize=11, color="black")
+ax.set_ylabel("North from centroid (km)", fontsize=11, color="black")
+ax.tick_params(colors="black", labelsize=9)
 for spine in ax.spines.values():
-    spine.set_edgecolor("#444444")
+    spine.set_edgecolor("black")
 
 method_label = "Ordinary Kriging" if INTERP_METHOD == "kriging" else "IDW (power=2)"
 ax.set_title(
     f"Animal Sighting Value Density — Etosha National Park\n"
-    f"Σ  P(sighting) × Price × Population  |  1 km² grid  |  {method_label}",
-    fontsize=13, fontweight="bold", color="white", pad=16,
+    f"Σ  P(sighting) × Price × Population",
+    fontsize=13, fontweight="bold", color="black", pad=16,
 )
 
 sm   = plt.cm.ScalarMappable(norm=norm, cmap=cmap)
 cbar = fig.colorbar(sm, ax=ax, pad=0.02, fraction=0.025)
 cbar.set_label("Σ  P(sighting) × Price × Population",
-               fontsize=10, color="#cccccc")
-cbar.ax.yaxis.set_tick_params(color="#aaaaaa")
-plt.setp(cbar.ax.yaxis.get_ticklabels(), color="#aaaaaa")
+               fontsize=10, color="black")
+cbar.ax.yaxis.set_tick_params(color="black")
+plt.setp(cbar.ax.yaxis.get_ticklabels(), color="black")
 
 handles, labels = ax.get_legend_handles_labels()
 seen = {}
@@ -343,150 +521,143 @@ for h, l in zip(handles, labels):
     if l not in seen:
         seen[l] = h
 ax.legend(seen.values(), seen.keys(), loc="upper right", fontsize=9,
-          facecolor="#1e2433", edgecolor="#555555", labelcolor="white")
+          facecolor="white", edgecolor="black", labelcolor="black")
 
 ax.set_aspect("equal")
 plt.tight_layout()
 plt.savefig(OUTPUT_PNG, dpi=160, bbox_inches="tight",
             facecolor=fig.get_facecolor())
-# print(f"\nSaved → {OUTPUT_PNG}")
-# plt.show()
-
 
 # ── 8. Plot all per-animal probability maps in a grid ────────────────────────
 n_animals = len(animal_names)
 n_cols    = 4
-n_rows    = (n_animals + n_cols - 1) // n_cols   # ceiling division
+n_rows    = (n_animals + n_cols - 1) // n_cols
 
 fig2, axes = plt.subplots(n_rows, n_cols,
-                          figsize=(n_cols * 5, n_rows * 4),
-                          facecolor="#0d1117")
+                          figsize=(n_cols * 5, n_rows * 2.2),
+                          facecolor="white")
+
 axes_flat = axes.flatten()
 
-cmap_prob = plt.cm.YlGn
+cmap_prob = plt.cm.YlGnBu
 norm_prob  = mcolors.Normalize(vmin=0, vmax=1)
 
 for i, name in enumerate(animal_names):
     ax = axes_flat[i]
-    ax.set_facecolor("#0d1117")
+    ax.set_facecolor("white")
 
-    prob_grid = animal_maps[name]["prob"]
 
-    ax.pcolormesh(XI, YI, prob_grid, cmap=cmap_prob, norm=norm_prob,
-                  shading="auto", zorder=1)
+    # ── Aggregate 1 km prob grid → 5 km ──────────────────────────────────
+    prob_grid_1km = animal_maps[name]["prob"]
+    prob_grid_5km = aggregate_1km_to_5km(prob_grid_1km) / 25  # mean, not sum
+    prob_grid_5km[~center_inside] = np.nan
+
+    ax.pcolormesh(XI_5km, YI_5km, prob_grid_5km,
+                  cmap=cmap_prob, norm=norm_prob,
+                  shading="nearest", zorder=1)
 
     # Park boundary
     for geom in park_proj.geometry:
         if geom.geom_type == "Polygon":
             xs, ys = geom.exterior.xy
             ax.plot([v / 1000 for v in xs], [v / 1000 for v in ys],
-                    color="white", linewidth=0.8, zorder=3)
+                    color="black", linewidth=0.8, zorder=3)
         elif geom.geom_type == "MultiPolygon":
             for part in geom.geoms:
                 xs, ys = part.exterior.xy
                 ax.plot([v / 1000 for v in xs], [v / 1000 for v in ys],
-                        color="white", linewidth=0.8, zorder=3)
+                        color="black", linewidth=0.8, zorder=3)
+    ax.scatter(x_km, y_km, c="cyan", s=10, zorder=4, edgecolors="none")
+    ax.set_title(f"{name}\npopulation: {populations[i]:,.0f}",
+                 fontsize=8, color="black", pad=4)
 
-    # Lodge dots
-    ax.scatter(x_km, y_km, c="cyan", s=10, zorder=4,
-               edgecolors="none")
-
-    # Title with price × population weight
-    w = prices[animal_names.index(name)] * populations[animal_names.index(name)]
-    ax.set_title(f"{name}\n$P \\times$ pop: {w:,.0f}",
-                 fontsize=8, color="white", pad=4)
-
-    ax.tick_params(colors="#aaaaaa", labelsize=6)
+    ax.tick_params(colors="black", labelsize=6)
     ax.set_aspect("equal")
     for spine in ax.spines.values():
-        spine.set_edgecolor("#333333")
+        spine.set_edgecolor("black")
 
-# Hide any unused subplot panels
+
+
 for j in range(n_animals, len(axes_flat)):
     axes_flat[j].set_visible(False)
 
-# Shared colorbar
-sm2   = plt.cm.ScalarMappable(norm=norm_prob, cmap=cmap_prob)
-cbar2 = fig2.colorbar(sm2, ax=axes_flat[:n_animals],
-                      pad=0.02, fraction=0.015, location="right")
-cbar2.set_label("P(sighting)  [0 = never → 1 = always]",
-                fontsize=9, color="#cccccc")
-cbar2.ax.yaxis.set_tick_params(color="#aaaaaa")
-plt.setp(cbar2.ax.yaxis.get_ticklabels(), color="#aaaaaa")
+# Colorbar in its own axis to the right of the whole figure — no overlap
+fig2.subplots_adjust(right=0.88)
+cbar_ax = fig2.add_axes([0.90, 0.15, 0.015, 0.7])  # [left, bottom, width, height]
+sm2 = plt.cm.ScalarMappable(norm=norm_prob, cmap=cmap_prob)
+cbar2 = fig2.colorbar(sm2, cax=cbar_ax)
+cbar2.set_label("Probability of sighting)",
+                fontsize=9, color="black")
+cbar2.ax.yaxis.set_tick_params(color="black")
+plt.setp(cbar2.ax.yaxis.get_ticklabels(), color="black")
 
 fig2.suptitle(
-    f"Per-Animal Sighting Probability Maps — Etosha  ({method_label})",
-    fontsize=13, fontweight="bold", color="white", y=1.01
+    f"Per-Animal Sighting Probability Maps — Etosha National Park",
+    fontsize=13, fontweight="bold", color="black", y=0.98
 )
-
-plt.tight_layout()
-fig2.savefig("etosha_per_animal_maps.png", dpi=150,
-             bbox_inches="tight", facecolor=fig2.get_facecolor())
+plt.tight_layout(rect=[0,0,0.88, 0.97])
+plt.savefig("etosha_per_animal_maps.png", dpi=150,
+            bbox_inches="tight", facecolor=fig2.get_facecolor())
 print("Saved → etosha_per_animal_maps.png")
 plt.show()
 
 # ================================================================
 # PLOT 5 km PIXELATED MAP
 # ================================================================
-fig, ax = plt.subplots(figsize=(16, 9), facecolor="#0d1117")
-ax.set_facecolor("#0d1117")
+fig, ax = plt.subplots(figsize=(16, 9), facecolor="white")
+ax.set_facecolor("white")
 
 cmap = plt.cm.YlOrRd
 vmin = np.nanpercentile(total_value_5km, 2)
 vmax = np.nanpercentile(total_value_5km, 98)
 norm = mcolors.Normalize(vmin=vmin, vmax=vmax)
 
-# pcolormesh with the 5km grid — each cell is a visible 5×5 km block
 ax.pcolormesh(XI_5km, YI_5km, total_value_5km,
               cmap=cmap, norm=norm, shading="nearest", zorder=1)
-
 
 # Park boundary
 for geom in park_proj.geometry:
     if geom.geom_type == "Polygon":
         xs, ys = geom.exterior.xy
         ax.plot([v / 1000 for v in xs], [v / 1000 for v in ys],
-                color="white", linewidth=1.8, zorder=4)
+                color="black", linewidth=1.8, zorder=4)
     elif geom.geom_type == "MultiPolygon":
         for part in geom.geoms:
             xs, ys = part.exterior.xy
             ax.plot([v / 1000 for v in xs], [v / 1000 for v in ys],
-                    color="white", linewidth=1.8, zorder=4)
+                    color="black", linewidth=1.8, zorder=4)
 
 # Lodge markers
-ax.scatter(x_km, y_km, c="cyan", s=50, zorder=5,
+ax.scatter(x_km, y_km, c="steelblue", s=50, zorder=5,
            edgecolors="black", linewidths=0.5, label="Lodges / camps")
 for j, loc in enumerate(location_cols):
     ax.annotate(loc, (x_km[j], y_km[j]), fontsize=6.5,
-                color="white", xytext=(5, 4), textcoords="offset points", zorder=6)
+                color="black", xytext=(5, 4), textcoords="offset points", zorder=6)
 
-ax.plot(0, 0, "+", color="white", markersize=14,
+ax.plot(0, 0, "+", color="black", markersize=14,
         markeredgewidth=2.5, zorder=6, label="Park centroid (0, 0)")
 
-# Grid lines at 5km intervals so you can see the discrete cells
-ax.grid(True, linestyle="--", alpha=0.15, color="white", zorder=0)
-
-ax.set_xlabel("Easting from centroid (km)",  fontsize=11, color="#cccccc")
-ax.set_ylabel("Northing from centroid (km)", fontsize=11, color="#cccccc")
-ax.tick_params(colors="#aaaaaa", labelsize=9)
+ax.grid(True, linestyle="--", alpha=0.15, color="black", zorder=0)
+ax.set_xlabel("East from centroid (km)",  fontsize=11, color="black")
+ax.set_ylabel("North from centroid (km)", fontsize=11, color="black")
+ax.tick_params(colors="black", labelsize=9)
 for spine in ax.spines.values():
-    spine.set_edgecolor("#444444")
+    spine.set_edgecolor("black")
 
 ax.set_title(
-    "Animal Sighting Value Density — Etosha National Park  [5 km × 5 km grid]\n"
-    "Σ  P(sighting) × Price × Population  |  summed from 1 km² kriging",
-    fontsize=13, fontweight="bold", color="white", pad=16,
+    "Animal Sighting Value — Etosha National Park",
+    fontsize=13, fontweight="bold", color="black", pad=16,
 )
 
 sm   = plt.cm.ScalarMappable(norm=norm, cmap=cmap)
 cbar = fig.colorbar(sm, ax=ax, pad=0.02, fraction=0.025)
-cbar.set_label("Σ  P(sighting) × Price × Population",
-               fontsize=10, color="#cccccc")
-cbar.ax.yaxis.set_tick_params(color="#aaaaaa")
-plt.setp(cbar.ax.yaxis.get_ticklabels(), color="#aaaaaa")
+cbar.set_label("Poacher's Percieved Value ($)",
+               fontsize=10, color="black")
+cbar.ax.yaxis.set_tick_params(color="black")
+plt.setp(cbar.ax.yaxis.get_ticklabels(), color="black")
 
 ax.legend(loc="upper right", fontsize=9,
-          facecolor="#1e2433", edgecolor="#555555", labelcolor="white")
+          facecolor="white", edgecolor="black", labelcolor="black")
 ax.set_aspect("equal")
 plt.tight_layout()
 plt.savefig("etosha_animal_value_5km.png", dpi=160,
