@@ -19,11 +19,11 @@ import geopandas as gpd
 BUDGETS = [
     {
         "label":           "70k",
-        "results_csv":     "etosha_path_results_1.5change.csv",
+        "results_csv":     "etosha_path_results_0.5change.csv",
         "drone_paths_csv": "selected_drone_paths.csv",
         "human_paths_csv": "selected_human_paths.csv",
         "fire_csv":        "fire_risk_5km.csv",
-        "out_png":         "etosha_results_1.5.png",
+        "out_png":         "etosha_results_0.5.png",
     },
 ]
  
@@ -246,7 +246,7 @@ for cfg in BUDGETS:
     )
  
     fig.suptitle(
-        f"Security Optimization (λ = 1.5)",
+        f"Security Optimization (λ = 0.5)",
         color="black", fontsize=14, fontweight="bold", y=0.98, x=0.37
     )
     fig.tight_layout(rect=[0,0,0.79,1])
