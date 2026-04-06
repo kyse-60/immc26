@@ -62,14 +62,14 @@ FIXED_ASSETS = {
         "range_km":   3.0,
         "cost_raw":   160,
         "cost":       160 / COST_UNIT,   # add this directly
-        "max_total":  123,
+        "max_total":  141,
     },
     "camera": {
         "efficiency": 0.50,
         "range_km":   3.0,
         "cost_raw":   100,
         "cost":       100 / COST_UNIT,   # add this directly
-        "max_total":  123,
+        "max_total":  134,
     }
 }
 
