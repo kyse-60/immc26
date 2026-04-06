@@ -1,0 +1,25 @@
+code,species,type,body_mass_kg,initial_pop
+PLANTS,Plants,producer,0.001,
+BUGS,Ants/Termites,herbivore,0.001,
+ACIJUB,Cheetah,carnivore,54,150
+AEPMEL,Black-Faced Impala,herbivore,60,2500
+ALCBUS,Hartebeest,herbivore,150,160
+CARCAR,Caracal,carnivore,13,50
+CONTAU,Wildebeest,herbivore,250,3000
+CROCRO,Spotted/Brown Hyena,carnivore,70,400
+EQUBUR,Plains Zebra,herbivore,350,15000
+GIRCAM,Giraffe,herbivore,1000,3000
+LEPSER,Serval,carnivore,11,200
+LOXAFR,African Elephant,herbivore,4000,2500
+MADKIR,Kirk's Dik-dik,herbivore,5,1000
+PANLEO,Lion,carnivore,175,500
+PANPAR,Leopard,carnivore,60,350
+PHAACT,Common Warthog,omnivore,82,3000
+PROCAP,Rock Hyrax,herbivore,4,15000
+TAUORY,Common Eland,herbivore,500,1500
+ORYXOR,Oryx,herbivore,200,3000
+BRHINO,Black Rhino,herbivore,1000,700
+WRHINO,White Rhino,herbivore,2000,1400
+ANTELO,Roan/Sable Antelope,herbivore,230,20000
+PANGOL,Pangolin,insectivore,13,7000
+AARDVA,Aardvark,insectivore,60,15000
