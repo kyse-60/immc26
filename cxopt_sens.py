@@ -86,7 +86,7 @@ coeff = 1.1
 # ================================================================
 # 2.  PROBLEM SETTINGS
 # ================================================================
-BUDGET_RAW    = 70000          # $ per week
+BUDGET_RAW    = 60000          # $ per week
 BUDGET        = BUDGET_RAW / COST_UNIT   # in cost units
 TIME_LIMIT_MS = 500_000
 MIP_GAP       = 0.05             # slightly relaxed for faster solve

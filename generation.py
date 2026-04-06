@@ -38,7 +38,7 @@ MAX_INFLUENCE_KM  = 100 * SENSOR_RANGE_KM
 CELL_SIZE_KM      = 5.0
 MAX_PATH_LEN      = 7
 MINUTES_PER_CELL  = 30 / 7
-coeff = 1.5
+coeff = 0.5
 
 # Cardinal movement
 DIRECTIONS = [(-1,0),(1,0),(0,-1),(0,1)]
@@ -243,7 +243,7 @@ def main():
     parser.add_argument("--max-len",      type=int, default=MAX_PATH_LEN)
     parser.add_argument("--top-n",        type=int, default=200)
     parser.add_argument("--out-raw",      default="drone_paths_raw.csv")
-    parser.add_argument("--out-filtered", default="drone_paths_filtered_1.5.csv")
+    parser.add_argument("--out-filtered", default="drone_paths_filtered_0.5.csv")
     parser.add_argument("--out-summary",  default="drone_paths_summary.txt")
     args = parser.parse_args()
 

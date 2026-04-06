@@ -37,7 +37,7 @@ MAX_INFLUENCE_KM  = 100 * SENSOR_RANGE_KM
 CELL_SIZE_KM      = 5.0
 MAX_PATH_LEN      = 3          # humans cover less ground
 MINUTES_PER_CELL  = 30/3         # rough estimate: 30 min per 5km cell on foot
-coeff = 1.5
+coeff = 0.5
 
 # 8-directional movement
 DIRECTIONS = [(-1,0),(1,0),(0,-1),(0,1),(-1,-1),(-1,1),(1,-1),(1,1)]
@@ -225,7 +225,7 @@ def main():
     parser.add_argument("--max-len",      type=int, default=MAX_PATH_LEN)
     parser.add_argument("--top-n",        type=int, default=200)
     parser.add_argument("--out-raw",      default="human_paths_raw.csv")
-    parser.add_argument("--out-filtered", default="human_paths_filtered_1.5.csv")
+    parser.add_argument("--out-filtered", default="human_paths_filtered_0.5.csv")
     parser.add_argument("--out-summary",  default="human_paths_summary.txt")
     args = parser.parse_args()
 
