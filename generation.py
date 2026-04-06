@@ -38,6 +38,7 @@ MAX_INFLUENCE_KM  = 100 * SENSOR_RANGE_KM
 CELL_SIZE_KM      = 5.0
 MAX_PATH_LEN      = 7
 MINUTES_PER_CELL  = 30 / 7
+coeff = 1.5
 
 # Cardinal movement
 DIRECTIONS = [(-1,0),(1,0),(0,-1),(0,1)]
@@ -108,7 +109,7 @@ def build_danger(fire_csv: str, animal_csv: str):
                                          #     and consistent with the optimizer.
     animal_norm = norm(animal_arr)
 
-    danger = fire_norm + animal_norm     # [0, 2], NaN outside park
+    danger = (2-coeff)*fire_norm + (coeff)*animal_norm     # [0, 2], NaN outside park
     danger[~in_park] = 0.0              # zero out-of-park cells (was NaN, caused colour wash)
 
     return danger, in_park, fire_df.index.values, fire_df.columns.values
@@ -242,7 +243,7 @@ def main():
     parser.add_argument("--max-len",      type=int, default=MAX_PATH_LEN)
     parser.add_argument("--top-n",        type=int, default=200)
     parser.add_argument("--out-raw",      default="drone_paths_raw.csv")
-    parser.add_argument("--out-filtered", default="drone_paths_filtered.csv")
+    parser.add_argument("--out-filtered", default="drone_paths_filtered_1.5.csv")
     parser.add_argument("--out-summary",  default="drone_paths_summary.txt")
     args = parser.parse_args()
 

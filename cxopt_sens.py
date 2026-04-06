@@ -185,8 +185,8 @@ def str_to_path(s: str):
  
  
 print("\nLoading candidate paths ...")
-drone_df = pd.read_csv("drone_paths_filtered.csv")
-human_df = pd.read_csv("human_paths_filtered.csv")
+drone_df = pd.read_csv("drone_paths_filtered_1.5.csv")
+human_df = pd.read_csv("human_paths_filtered_1.5.csv")
  
 drone_paths   = [str_to_path(s) for s in drone_df["path_str"]]
 human_paths   = [str_to_path(s) for s in human_df["path_str"]]
@@ -476,8 +476,8 @@ for i, (r, c) in enumerate(valid_cells):
         "covered_by_drone": int(any(drone_removal[p, i] > 1e-6 for p in sel_drone)),
         "covered_by_human": int(any(human_removal[p, i] > 1e-6 for p in sel_human)),
     })
-pd.DataFrame(rows_out).to_csv("cvxopt_results_fr/etosha_path_results_1.1change.csv", index=False)
-print("Cell-level results   -> etosha_path_results_1.1change.csv")
+pd.DataFrame(rows_out).to_csv("etosha_path_results_1.5change.csv", index=False)
+print("Cell-level results   -> etosha_path_results_1.5change.csv")
  
 drone_out = [
     {**drone_df.iloc[p].to_dict(),

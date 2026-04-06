@@ -37,6 +37,7 @@ MAX_INFLUENCE_KM  = 100 * SENSOR_RANGE_KM
 CELL_SIZE_KM      = 5.0
 MAX_PATH_LEN      = 3          # humans cover less ground
 MINUTES_PER_CELL  = 30/3         # rough estimate: 30 min per 5km cell on foot
+coeff = 1.5
 
 # 8-directional movement
 DIRECTIONS = [(-1,0),(1,0),(0,-1),(0,1),(-1,-1),(-1,1),(1,-1),(1,1)]
@@ -95,7 +96,7 @@ def build_danger(fire_csv: str, animal_csv: str):
         mn, mx = np.nanmin(arr), np.nanmax(arr)
         return (arr - mn) / (mx - mn) if mx > mn else np.zeros_like(arr)
 
-    danger  = (1-norm(fire_arr)) + norm(animal_arr)
+    danger  = (2- coeff)*(1-norm(fire_arr)) + (coeff) * norm(animal_arr)
     in_park = ~(np.isnan(fire_arr) | np.isnan(animal_arr))
 
     return danger, in_park, fire_df.index.values, fire_df.columns.values
@@ -224,7 +225,7 @@ def main():
     parser.add_argument("--max-len",      type=int, default=MAX_PATH_LEN)
     parser.add_argument("--top-n",        type=int, default=200)
     parser.add_argument("--out-raw",      default="human_paths_raw.csv")
-    parser.add_argument("--out-filtered", default="human_paths_filtered.csv")
+    parser.add_argument("--out-filtered", default="human_paths_filtered_1.5.csv")
     parser.add_argument("--out-summary",  default="human_paths_summary.txt")
     args = parser.parse_args()
 

@@ -16,7 +16,7 @@ import geopandas as gpd
 # ================================================================
 # CONFIG
 # ================================================================
-RESULTS_CSV      = "cvxopt_results_fr/etosha_path_results_30k.csv"
+RESULTS_CSV      = "etosha_path_results_1.5change.csv"
 DRONE_PATHS_CSV  = "selected_drone_paths.csv"
 HUMAN_PATHS_CSV  = "selected_human_paths.csv"
 SHP_PATH         = "WDPA_WDOECM_Apr2026_Public_884_shp-polygons.shp"
@@ -251,7 +251,7 @@ add_cbar(fig, ax, plt.cm.ScalarMappable(norm=norm_d, cmap=cmap_d), "Residual dan
 fig.suptitle("Etosha National Park — Security Optimisation Results",
              color="black", fontsize=14, fontweight="bold", y=0.8)
 fig.tight_layout()
-plt.savefig("cvxopt_results_fr/etosha_results_3panel.png", dpi=160, bbox_inches="tight",
+plt.savefig("etosha_results_3panel.png", dpi=160, bbox_inches="tight",
             facecolor="white")
 print("  Saved → etosha_results_3panel.png")
 plt.close(fig)
@@ -286,7 +286,7 @@ ax2.set_title("Danger Reduction per Cell — Etosha National Park\n"
               "Green = fully neutralised  |  Red = untouched",
               color="black", fontsize=13, fontweight="bold")
 plt.tight_layout()
-plt.savefig("cvxopt_results_fr/etosha_results_reduction.png", dpi=160, bbox_inches="tight",
+plt.savefig("etosha_results_reduction.png", dpi=160, bbox_inches="tight",
             facecolor="white")
 print("  Saved → etosha_results_reduction.png")
 plt.close(fig2)
@@ -341,7 +341,7 @@ ax_human.set_title(f"Patrol paths  —  {len(human_paths_km)} selected",
  
 fig3.suptitle("Per-Asset-Type Maps — Etosha",
               color="black", fontsize=13, fontweight="bold", y=0.8)
-plt.savefig("cvxopt_results_fr/etosha_results_per_asset.png", dpi=160, bbox_inches="tight",
+plt.savefig("etosha_results_per_asset.png", dpi=160, bbox_inches="tight",
             facecolor="white")
 print("  Saved → etosha_results_per_asset.png")
 plt.close(fig3)
