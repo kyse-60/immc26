@@ -475,7 +475,7 @@ for i, (r, c) in enumerate(valid_cells):
         "covered_by_drone": int(any(drone_removal[p, i] > 1e-6 for p in sel_drone)),
         "covered_by_human": int(any(human_removal[p, i] > 1e-6 for p in sel_human)),
     })
-pd.DataFrame(rows_out).to_csv("cvxopt_results_fr/etosha_path_results.csv", index=False)
+pd.DataFrame(rows_out).to_csv("cvxopt_results_fr/etosha_path_results_70k.csv", index=False)
 print("Cell-level results   -> etosha_path_results.csv")
  
 drone_out = [
